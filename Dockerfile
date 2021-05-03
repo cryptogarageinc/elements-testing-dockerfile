@@ -1,4 +1,4 @@
-FROM node:14.15.0-buster-slim
+FROM node:14.16.1-buster-slim
 
 # install dependencies
 RUN apt update && apt install -y \
@@ -14,7 +14,7 @@ RUN apt update && apt install -y \
 WORKDIR /tmp
 ENV GPG_KEY_SERVER hkp://keyserver.ubuntu.com:80
 # setup bitcoin
-ARG BITCOIN_VERSION=0.21.0
+ARG BITCOIN_VERSION=0.21.1
 ENV BITCOIN_TARBALL bitcoin-${BITCOIN_VERSION}-x86_64-linux-gnu.tar.gz
 ENV BITCOIN_URL_BASE https://bitcoincore.org/bin/bitcoin-core-${BITCOIN_VERSION}
 ENV BITCOIN_PGP_KEY 01EA5486DE18A882D4C2684590C8019E36C2E964
