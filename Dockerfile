@@ -62,6 +62,11 @@ RUN wget -qO ${CMAKE_TARBALL} ${CMAKE_URL_BASE}/${CMAKE_TARBALL} \
   && ln -sfn /opt/cmake-${CMAKE_VERSION}-Linux-x86_64/bin/* /usr/bin \
   && rm -f ${CMAKE_TARBALL} cmake-*SHA-256.txt*
 
+ENV PATH $PATH:/opt/cmake-3.21.2-linux-x86_64/bin:/opt/elements-0.18.1.12/bin:/opt/bitcoin-22.0/bin
+
 WORKDIR /root
+
+RUN bitcoin-cli --version && elements-cli --version \
+  && python -V && node -v && cmake --version && env
 
 # TODO: set ENTRYPOINT
