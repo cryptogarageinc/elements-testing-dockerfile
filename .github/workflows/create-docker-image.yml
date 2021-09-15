@@ -30,7 +30,8 @@ jobs:
         PKG_TAG: ${{steps.get_version.outputs.PKG_TAG}}
       run: |
         docker build . -t "${PKG_TAG}" --build-arg BASE_IMAGE="${{ matrix.baseimage }}"
-        docker run --rm ${PKG_TAG} --version
+
+#       docker run --rm ${PKG_TAG} --version
 
 #    - name: Scan docker image
 #      env:
