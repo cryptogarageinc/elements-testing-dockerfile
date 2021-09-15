@@ -23,7 +23,7 @@ jobs:
       id: get_version
       run: |
         echo ::set-output name=PKG_TAG::${DOCKER_BASE_NAME}:${GITHUB_REF/refs\/tags\//}
-        echo ::set-output name=REP_USER_NAME::${REPOSITORY_PATH/\/elements-testing-dockerfile\//}
+        echo ::set-output name=REP_USER_NAME::${REPOSITORY_PATH/\/elements-testing-dockerfile//}
 
     - name: Build docker image
       env:
@@ -42,9 +42,9 @@ jobs:
 
     - name: Push to Packages
       env:
-        CR_TOKEN: ${{ secrets.CR_TOKEN }}
+        CR_TOKEN: ${{ secrets.CR_PAT }}
         PKG_TAG: ${{steps.get_version.outputs.PKG_TAG}}
-        REP_USER_NAME: ${{steps.get_version.outputs.REP_USER_NAME}}
+        REP_USER_NAME: ${{ secrets.CR_USER_NAME }}
       run: |
-        echo "${CR_TOKEN}" | docker login ghcr.io -u ${REP_USER_NAME} --password-stdin
+        echo "$CR_TOKEN" | docker login ghcr.io -u "$REP_USER_NAME" --password-stdin
         docker push "${PKG_TAG}"
