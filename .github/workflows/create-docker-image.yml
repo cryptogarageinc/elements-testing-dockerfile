@@ -7,15 +7,15 @@ on:
     - 'bitcoin-*'
 
 env:
-  DOCKER_BASE_NAME: docker.pkg.github.com/${{ github.repository }}/elements-testing
+  DOCKER_BASE_NAME: ghcr.io/${{ github.repository_owner }}/elements-testing
   REPOSITORY_PATH: ${{ github.repository }}
 
 jobs:
   upload-image:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
-        baseimage: ['node:14.15.0-buster-slim']
+        baseimage: ['python:3.9.7-slim-buster']
 
     steps:
     - uses: actions/checkout@v2
@@ -41,9 +41,9 @@ jobs:
 
     - name: Push to Packages
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        CR_TOKEN: ${{ secrets.CR_TOKEN }}
         PKG_TAG: ${{steps.get_version.outputs.PKG_TAG}}
         REP_USER_NAME: ${{steps.get_version.outputs.REP_USER_NAME}}
       run: |
-        echo "${GITHUB_TOKEN}" | docker login docker.pkg.github.com -u ${REP_USER_NAME} --password-stdin
+        echo "${CR_TOKEN}" | docker login ghcr.io -u ${REP_USER_NAME} --password-stdin
         docker push "${PKG_TAG}"
