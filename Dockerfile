@@ -34,21 +34,25 @@ RUN wget -qO ${BITCOIN_TARBALL} ${BITCOIN_URL_BASE}/${BITCOIN_TARBALL} \
     && rm -f ${BITCOIN_TARBALL} SHA256SUMS.asc
 
 # setup elements
-ARG ELEMENTS_VERSION=0.18.1.12
-ENV ELEMENTS_TARBALL elements-${ELEMENTS_VERSION}-x86_64-linux-gnu.tar.gz
+ARG ELEMENTS_VERSION=0.21.0
+ENV ELEMENTS_TARBALL elements-elements-${ELEMENTS_VERSION}-x86_64-linux-gnu.tar.gz
 ENV ELEMENTS_URL_BASE https://github.com/ElementsProject/elements/releases/download/elements-${ELEMENTS_VERSION}
 ENV ELEMENTS_PGP_KEY DE10E82629A8CAD55B700B972F2A88D7F8D68E87
 RUN wget -qO ${ELEMENTS_TARBALL} ${ELEMENTS_URL_BASE}/${ELEMENTS_TARBALL} \
   && gpg --keyserver ${GPG_KEY_SERVER} --recv-keys ${ELEMENTS_PGP_KEY} \
   && wget -qO SHA256SUMS.asc ${ELEMENTS_URL_BASE}/SHA256SUMS.asc \
-  && gpg --verify SHA256SUMS.asc \
   && sha256sum --ignore-missing --check SHA256SUMS.asc \
   && tar -xzvf ${ELEMENTS_TARBALL} --directory=/opt/ \
+  && mv /opt/elements-elements-* /opt/elements-${ELEMENTS_VERSION} \
   && ln -sfn /opt/elements-${ELEMENTS_VERSION}/bin/* /usr/bin \
   && rm -f ${ELEMENTS_TARBALL} SHA256SUMS.asc
 
+# unsigned 0.21.0
+#  && gpg --verify SHA256SUMS.asc \
+
+
 # setup cmake
-ENV CMAKE_VERSION 3.21.2
+ENV CMAKE_VERSION 3.21.3
 ENV CMAKE_TARBALL cmake-${CMAKE_VERSION}-linux-x86_64.tar.gz
 ENV CMAKE_URL_BASE https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}
 ENV CMAKE_PGP_KEY 2D2CEF1034921684
@@ -62,11 +66,11 @@ RUN wget -qO ${CMAKE_TARBALL} ${CMAKE_URL_BASE}/${CMAKE_TARBALL} \
   && ln -sfn /opt/cmake-${CMAKE_VERSION}-Linux-x86_64/bin/* /usr/bin \
   && rm -f ${CMAKE_TARBALL} cmake-*SHA-256.txt*
 
-ENV PATH $PATH:/opt/cmake-3.21.2-linux-x86_64/bin:/opt/elements-0.18.1.12/bin:/opt/bitcoin-22.0/bin
+ENV PATH $PATH:/opt/cmake-3.21.3-linux-x86_64/bin:/opt/elements-${ELEMENTS_VERSION}/bin:/opt/bitcoin-${BITCOIN_VERSION}/bin
 
 WORKDIR /root
 
-RUN bitcoin-cli --version && elements-cli --version \
+CMD bitcoin-cli --version && elements-cli --version \
   && python -V && node -v && cmake --version && env
 
 # TODO: set ENTRYPOINT
