@@ -1,16 +1,17 @@
 FROM python:3.9.7-slim-buster
 
 # install dependencies
-RUN apt update && apt install -y \
+RUN apt-get update && apt-get install -y --no-install-recommend \
     gpg \
     wget \
     build-essential \
     nodejs \
     npm \
     git \
+  && apt-get -y clean \
+  && rm -rf /var/lib/apt/lists/* \
   && npm install -g n \
-  && n lts \
-  && rm -rf /var/lib/apt/lists/*
+  && n lts
 
 RUN python -V && node -v
 
