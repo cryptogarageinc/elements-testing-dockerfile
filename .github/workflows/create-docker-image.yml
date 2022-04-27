@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        baseimage: ['python:3.9.10-slim-buster']
+        baseimage: ['3.10.4-slim-bullseye']
 
     steps:
     - uses: actions/checkout@v2
