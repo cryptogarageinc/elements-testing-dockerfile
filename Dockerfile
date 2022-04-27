@@ -1,5 +1,8 @@
 FROM python:3.10.4-slim-bullseye
 
+RUN mkdir /var/.npm \
+  && echo 'prefix = /var/.npm' > ~/.npmrc
+
 # install dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     dirmngr \
@@ -11,11 +14,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     npm \
     git \
   && apt-get -y clean \
-  && rm -rf /var/lib/apt/lists/* \
+  && rm -rf /var/lib/apt/lists/*
+
+ENV USER_NAME testuser
+RUN useradd --user-group --create-home --shell /bin/false ${USER_NAME} \
+  && chown ${USER_NAME}:${USER_NAME} /var/.npm
+
+RUN export PATH=/var/.npm/bin:$PATH \
   && npm install -g n \
   && n lts
 
-RUN python -V && node -v
+RUN python -V && node -v && npm -v
 
 WORKDIR /tmp
 ENV GPG_KEY_SERVER hkps://keyserver.ubuntu.com
@@ -80,11 +89,18 @@ RUN wget -qO ${CMAKE_TARBALL} ${CMAKE_URL_BASE}/${CMAKE_TARBALL} \
   && ln -sfn /opt/cmake-${CMAKE_VERSION}-Linux-x86_64/bin/* /usr/bin \
   && rm -f ${CMAKE_TARBALL} cmake-*SHA-256.txt*
 
-ENV PATH $PATH:/opt/cmake-${CMAKE_VERSION}-linux-x86_64/bin:/opt/elements-${ELEMENTS_VERSION}/bin:/opt/bitcoin-${BITCOIN_VERSION}/bin
+ENV PATH /var/.npm/bin:/opt/cmake-${CMAKE_VERSION}-linux-x86_64/bin:/opt/elements-${ELEMENTS_VERSION}/bin:/opt/bitcoin-${BITCOIN_VERSION}/bin:$PATH
 
 WORKDIR /root
 
 CMD bitcoin-cli --version && elements-cli --version \
-  && python -V && node -v && cmake --version && env
+  && python -V && echo "node version" && node -v && echo "npm version" && npm -v \
+  && cmake --version && env
+
+USER ${USER_NAME}
+
+ENV PATH /var/.npm/bin:/opt/cmake-${CMAKE_VERSION}-linux-x86_64/bin:/opt/elements-${ELEMENTS_VERSION}/bin:/opt/bitcoin-${BITCOIN_VERSION}/bin:$PATH
+
+RUN echo 'prefix = /var/.npm' > ~/.npmrc
 
 # TODO: set ENTRYPOINT
