@@ -1,4 +1,4 @@
-FROM --platform=$TARGETPLATFORM python:3.10.7-slim-bullseye
+FROM --platform=$TARGETPLATFORM python:3.10.8-slim-bullseye
 
 # NOTE: nodedir has used by cmake-js.
 RUN mkdir /var/.npm \
