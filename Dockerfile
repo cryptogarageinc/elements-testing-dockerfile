@@ -1,4 +1,4 @@
-FROM --platform=$TARGETPLATFORM python:3.10.7-slim-bullseye
+FROM --platform=$TARGETPLATFORM python:3.10.8-slim-bullseye
 
 # NOTE: nodedir has used by cmake-js.
 RUN mkdir /var/.npm \
@@ -64,14 +64,13 @@ RUN if [ "${TARGETARCH}" = "arm64" ]; then \
 
 
 # setup elements
-ARG ELEMENTS_VERSION=0.21.0.2
+ARG ELEMENTS_VERSION=22.0.2
 ENV ELEMENTS_URL_BASE https://github.com/ElementsProject/elements/releases/download/elements-${ELEMENTS_VERSION}
 ENV ELEMENTS_PGP_KEY DE10E82629A8CAD55B700B972F2A88D7F8D68E87 BD0F3062F87842410B06A0432F656B0610604482
 RUN if [ "${TARGETARCH}" = "arm64" ]; then \
-      export ELEMENTS_TARBALL0=elements-elements-${ELEMENTS_VERSION}-aarch64-linux-gnu.tar.gz ;\
-      export ELEMENTS_TARBALL=elements-elements-${ELEMENTS_VERSION}-arm-linux-gnueabihf.tar.gz ;\
+      export ELEMENTS_TARBALL=elements-${ELEMENTS_VERSION}-aarch64-linux-gnu.tar.gz ;\
     else \
-      export ELEMENTS_TARBALL=elements-elements-${ELEMENTS_VERSION}-x86_64-linux-gnu.tar.gz ;\
+      export ELEMENTS_TARBALL=elements-${ELEMENTS_VERSION}-x86_64-linux-gnu.tar.gz ;\
     fi \
   && wget -qO ${ELEMENTS_TARBALL} ${ELEMENTS_URL_BASE}/${ELEMENTS_TARBALL} \
   && gpg -v --keyserver ${GPG_KEY_SERVER} --recv-keys ${ELEMENTS_PGP_KEY} \
@@ -79,7 +78,6 @@ RUN if [ "${TARGETARCH}" = "arm64" ]; then \
   && gpg --verify SHA256SUMS.asc \
   && sha256sum --ignore-missing --check SHA256SUMS.asc \
   && tar -xzvf ${ELEMENTS_TARBALL} --directory=/opt/ \
-  && mv /opt/elements-elements-* /opt/elements-${ELEMENTS_VERSION} \
   && ln -sfn /opt/elements-${ELEMENTS_VERSION}/bin/* /usr/bin \
   && rm -f ${ELEMENTS_TARBALL} SHA256SUMS.asc
 
