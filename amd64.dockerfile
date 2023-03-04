@@ -1,4 +1,4 @@
-FROM python:3.10.8-slim-bullseye
+FROM python:3.11.2-slim-bullseye
 
 # NOTE: nodedir has used by cmake-js.
 RUN mkdir /var/.npm \
@@ -24,7 +24,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   && apt-get -y clean \
   && rm -rf /var/lib/apt/lists/*
 
-RUN export PATH=/var/.npm/bin:$PATH \
+RUN export PATH="/var/.npm/bin:$PATH" \
   && npm install -g n \
   && n lts
 
@@ -60,7 +60,7 @@ RUN BITCOIN_TARBALL=bitcoin-${BITCOIN_VERSION}-x86_64-linux-gnu.tar.gz \
 
 
 # setup elements
-ARG ELEMENTS_VERSION=22.0.2
+ARG ELEMENTS_VERSION=22.1
 ENV ELEMENTS_URL_BASE https://github.com/ElementsProject/elements/releases/download/elements-${ELEMENTS_VERSION}
 ENV ELEMENTS_PGP_KEY DE10E82629A8CAD55B700B972F2A88D7F8D68E87 BD0F3062F87842410B06A0432F656B0610604482
 RUN ELEMENTS_TARBALL=elements-${ELEMENTS_VERSION}-x86_64-linux-gnu.tar.gz \
@@ -78,10 +78,10 @@ RUN ELEMENTS_TARBALL=elements-${ELEMENTS_VERSION}-x86_64-linux-gnu.tar.gz \
 
 
 # setup cmake
-ENV CMAKE_VERSION 3.24.2
+ENV CMAKE_VERSION 3.25.2
 ENV CMAKE_URL_BASE https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}
 ENV CMAKE_PGP_KEY 2D2CEF1034921684
-RUN CMAKE_TARBALL=cmake-${CMAKE_VERSION}-linux-x8664.tar.gz \
+RUN CMAKE_TARBALL=cmake-${CMAKE_VERSION}-linux-x86_64.tar.gz \
     && wget -qO ${CMAKE_TARBALL} ${CMAKE_URL_BASE}/${CMAKE_TARBALL} \
     && gpg --keyserver ${GPG_KEY_SERVER} --recv-keys ${CMAKE_PGP_KEY} \
     && wget -qO cmake-SHA-256.txt ${CMAKE_URL_BASE}/cmake-${CMAKE_VERSION}-SHA-256.txt \
@@ -94,6 +94,8 @@ RUN CMAKE_TARBALL=cmake-${CMAKE_VERSION}-linux-x8664.tar.gz \
 
 ENV PATH /var/.npm/bin:/opt/cmake-${CMAKE_VERSION}-linux-x86_64/bin:/opt/elements-${ELEMENTS_VERSION}/bin:/opt/bitcoin-${BITCOIN_VERSION}/bin:$PATH
 
+COPY ./script/check.sh  /usr/local/bin/check.sh
+RUN chmod +x /usr/local/bin/check.sh
 
 ENV USER_NAME testuser
 RUN useradd --user-group --create-home --shell /bin/false ${USER_NAME} \
