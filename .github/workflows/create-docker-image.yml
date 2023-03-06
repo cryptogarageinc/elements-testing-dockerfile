@@ -5,6 +5,8 @@ on:
     tags:
     - 'v*'
     - 'bitcoin-*'
+  pull_request:
+    types: [opened, reopened, synchronize]
 
 env:
   IMAGE_BASE_NAME: "ghcr.io/${{ github.repository_owner }}/elements-testing"
