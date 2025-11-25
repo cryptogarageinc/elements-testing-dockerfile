@@ -13,7 +13,7 @@ env:
 
 jobs:
   upload-image:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
       contents: read

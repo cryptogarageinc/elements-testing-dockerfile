@@ -1,4 +1,4 @@
-FROM python:3.11.3-slim-bullseye
+FROM python:3.11.14-slim-bookworm
 
 # NOTE: nodedir has used by cmake-js.
 RUN mkdir /var/.npm \
@@ -48,9 +48,11 @@ RUN BITCOIN_TARBALL=bitcoin-${BITCOIN_VERSION}-x86_64-linux-gnu.tar.gz \
     && gpg --verify SHA256SUMS.asc 2>&1 | grep "using ECDSA key" | tr -s ' ' | cut -d ' ' -f5 \
     && echo "dump key" \
     && gpg --verify SHA256SUMS.asc 2>&1 | grep "using " | tr -s ' ' | cut -d ' ' -f5 \
+    && echo "gpg keyserver 1" \
     && gpg -v --keyserver ${GPG_KEY_SERVER} --recv-keys ${BITCOIN_PGP_KEY} \
+    && echo "gpg keyserver 2" \
     && gpg -v --keyserver hkps://keys.openpgp.org --recv-keys 82921A4B88FD454B7EB8CE3C796C4109063D4EAF \
-    && gpg -v --keyserver hkps://keys.openpgp.org --recv-keys C388F6961FB972A95678E327F62711DBDCA8AE56 \
+    && echo "verify checksum" \
     && sha256sum --ignore-missing --check SHA256SUMS \
     && tar -xzvf ${BITCOIN_TARBALL} --directory=/opt/ \
     && ln -sfn /opt/bitcoin-${BITCOIN_VERSION}/bin/* /usr/bin \
@@ -59,6 +61,10 @@ RUN BITCOIN_TARBALL=bitcoin-${BITCOIN_VERSION}-x86_64-linux-gnu.tar.gz \
 # 20220427: ignore gpg verify (for C388F6961FB972A95678E327F62711DBDCA8AE56)
 #    && gpg --verify -v SHA256SUMS.asc \
 #    && sha256sum --ignore-missing --check SHA256SUMS \
+
+# 20251126: ignore import key
+# && echo "gpg keyserver 3" \
+# && gpg -v --keyserver hkps://keys.openpgp.org --recv-keys C388F6961FB972A95678E327F62711DBDCA8AE56 \
 
 
 # setup elements
@@ -70,7 +76,9 @@ RUN ELEMENTS_TARBALL=elements-${ELEMENTS_VERSION}-x86_64-linux-gnu.tar.gz \
     && wget -qO ${ELEMENTS_TARBALL} ${ELEMENTS_URL_BASE}/${ELEMENTS_TARBALL} \
     && gpg -v --keyserver ${GPG_KEY_SERVER} --recv-keys ${ELEMENTS_PGP_KEY} \
     && wget -qO SHA256SUMS.asc ${ELEMENTS_URL_BASE}/SHA256SUMS.asc \
+    && echo "verify gpg" \
     && gpg --verify SHA256SUMS.asc \
+    && echo "verify checksum" \
     && sha256sum --ignore-missing --check SHA256SUMS.asc \
     && tar -xzvf ${ELEMENTS_TARBALL} --directory=/opt/ \
     && ln -sfn /opt/elements-${ELEMENTS_VERSION}/bin/* /usr/bin \
@@ -90,7 +98,9 @@ RUN CMAKE_TARBALL=cmake-${CMAKE_VERSION}-linux-x86_64.tar.gz \
     && gpg --keyserver ${GPG_KEY_SERVER} --recv-keys ${CMAKE_PGP_KEY} \
     && wget -qO cmake-SHA-256.txt ${CMAKE_URL_BASE}/cmake-${CMAKE_VERSION}-SHA-256.txt \
     && wget -qO cmake-SHA-256.txt.asc ${CMAKE_URL_BASE}/cmake-${CMAKE_VERSION}-SHA-256.txt.asc \
+    && echo "verify gpg" \
     && gpg --verify cmake-SHA-256.txt.asc \
+    && echo "verify checksum" \
     && sha256sum --ignore-missing --check cmake-SHA-256.txt \
     && tar -xzvf ${CMAKE_TARBALL} --directory=/opt/ \
     && ln -sfn /opt/cmake-${CMAKE_VERSION}-linux-x86_64/bin/* /usr/bin \
