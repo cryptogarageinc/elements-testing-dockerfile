@@ -6,9 +6,9 @@ tasks:
       - task: :hadolint
   gha-lint:
     vars:
-      PINACT_VERSION: v3.4.4
-      ACTIONLINT_VERSION: v1.7.8
-      GHALINT_VERSION: v1.5.3
+      PINACT_VERSION: latest
+      ACTIONLINT_VERSION: latest
+      GHALINT_VERSION: latest
     cmds:
       - go run github.com/suzuki-shunsuke/pinact/v3/cmd/pinact@{{.PINACT_VERSION}} run
       - go run github.com/rhysd/actionlint/cmd/actionlint@{{.ACTIONLINT_VERSION}}
@@ -19,6 +19,6 @@ tasks:
       - docker run --rm -i -v {{.TASK_DIR}}/.hadolint.yml:/.config/hadolint.yaml ghcr.io/hadolint/hadolint < arm64.dockerfile
   format:
     vars:
-      YAMLFMT_VERSION: v0.20.0
+      YAMLFMT_VERSION: latest
     cmds:
       - go run github.com/google/yamlfmt/cmd/yamlfmt@{{.YAMLFMT_VERSION}}
